@@ -55,26 +55,11 @@ function createStructuredData(response) {
   return allObjects;
 }
 
-async function run() {
-  const rawData = await fetchNasaData();
-  if (rawData) {
-    const structuredData = createStructuredData(rawData);
-    if (structuredData.length > 0) {
-      await indexDataIntoElasticsearch(structuredData);
-      console.log('Data indexed successfully.');
-    } else {
-      console.log('No data to index.');
-    }
-  } else {
-    console.log('Failed to fetch data from NASA.');
-  }
-}
-
 async function indexDataIntoElasticsearch(data) {
-  const indexExists = await client.indices.exists({ index: 'node-js-video-nasa' });
+  const indexExists = await client.indices.exists({ index: 'run-test-nasa' });
   if (!indexExists.body) {
     await client.indices.create({
-      index: 'node-js-video-nasa',
+      index: 'run-test-nasa',
       body: {
         mappings: {
           properties: {
@@ -88,8 +73,23 @@ async function indexDataIntoElasticsearch(data) {
     });
   }
 
-  const body = data.flatMap(doc => [{ index: { _index: 'node-js-video-nasa' } }, doc]);
+  const body = data.flatMap(doc => [{ index: { _index: 'run-test-nasa' } }, doc]);
   await client.bulk({ refresh: true, body });
+}
+
+async function run() {
+  const rawData = await fetchNasaData();
+  if (rawData) {
+    const structuredData = createStructuredData(rawData);
+    if (structuredData.length > 0) {
+      await indexDataIntoElasticsearch(structuredData);
+      console.log('Data indexed successfully.');
+    } else {
+      console.log('No data to index.');
+    }
+  } else {
+    console.log('Failed to fetch data from NASA.');
+  }
 }
 
 run().catch(console.error);
