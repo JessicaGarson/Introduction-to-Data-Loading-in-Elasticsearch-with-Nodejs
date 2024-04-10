@@ -1,1 +1,1 @@
-# Introduction to Data Loading in Elasticsearch with Node.js
+# Introduction to data loading in Elasticsearch with Node.js
