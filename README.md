@@ -6,9 +6,9 @@ This project is designed to upload Near Earth Object (NEO) data from NASA's API 
 
 Before you can run this project, you'll need to have the following installed:
 
-- Node.js
-- npm
-- Elasticsearch
+- [Node.js](https://nodejs.org/en)
+- [npm](https://www.npmjs.com)
+- [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started.html)
 
 Additionally, you'll need to have access to the NASA API, which requires an API key that can be obtained from [NASA APIs](https://api.nasa.gov).
 
