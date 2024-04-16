@@ -76,7 +76,7 @@ async function indexDataIntoElasticsearch(data) {
   if (!indexExists.body) {
     // If the index doesn't exist, create it with specified mappings
     await client.indices.create({
-      index: 'run-test-nasa',
+      index: 'ooorun-test-nasa',
       body: {
         mappings: {
           properties: {
@@ -103,6 +103,8 @@ async function run() {
   if (rawData) {
     // Structure the fetched data
     const structuredData = createStructuredData(rawData);
+    // Print the number of records
+    console.log(`Number of records being uploaded: ${structuredData.length}`);
     if (structuredData.length > 0) {
       // Index the structured data into Elasticsearch
       await indexDataIntoElasticsearch(structuredData);
