@@ -76,7 +76,7 @@ async function indexDataIntoElasticsearch(data) {
   if (!indexExists.body) {
     // If the index doesn't exist, create it with specified mappings
     await client.indices.create({
-      index: 'ooorun-test-nasa',
+      index: 'run-test-nasa',
       body: {
         mappings: {
           properties: {
