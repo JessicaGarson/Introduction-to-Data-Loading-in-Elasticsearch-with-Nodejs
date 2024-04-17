@@ -10,19 +10,13 @@ const elasticEndpoint = process.env.ELASTIC_ENDPOINT;
 const elasticApiKey = process.env.ELASTIC_API_KEY;
 const nasaApiKey = process.env.NASA_API_KEY;
 
-// // Initialize the Elasticsearch client with cloud ID and API key for authentication
-// const client = new Client({
-//   cloud: { id: elasticCloudId },
-//   auth: { apiKey: elasticApiKey },
-// });
-
+// Authenticate to Elasticsearch
 const client = new Client({
   node: elasticEndpoint,
   auth: {
     apiKey: elasticApiKey
   }
 })
-
 
 // Asynchronously fetch data from NASA's NEO (Near Earth Object) Web Service
 async function fetchNasaData() {
