@@ -6,15 +6,23 @@ const { Client } = require('@elastic/elasticsearch');
 const axios = require('axios');
 
 // Retrieve Elasticsearch and NASA API keys from environment variables
-const elasticCloudId = process.env.ELASTIC_CLOUD_ID;
+const elasticEndpoint = process.env.ELASTIC_ENDPOINT;
 const elasticApiKey = process.env.ELASTIC_API_KEY;
 const nasaApiKey = process.env.NASA_API_KEY;
 
-// Initialize the Elasticsearch client with cloud ID and API key for authentication
+// // Initialize the Elasticsearch client with cloud ID and API key for authentication
+// const client = new Client({
+//   cloud: { id: elasticCloudId },
+//   auth: { apiKey: elasticApiKey },
+// });
+
 const client = new Client({
-  cloud: { id: elasticCloudId },
-  auth: { apiKey: elasticApiKey },
-});
+  node: elasticEndpoint,
+  auth: {
+    apiKey: elasticApiKey
+  }
+})
+
 
 // Asynchronously fetch data from NASA's NEO (Near Earth Object) Web Service
 async function fetchNasaData() {
@@ -71,12 +79,12 @@ function createStructuredData(response) {
 
 // Asynchronously check for an index's existence in Elasticsearch and index data
 async function indexDataIntoElasticsearch(data) {
-  // Check if the 'run-test-nasa' index exists in the Elasticsearch database
-  const indexExists = await client.indices.exists({ index: 'run-test-nasa' });
+  // Check if the 'nasa-node-js' index exists in the Elasticsearch database
+  const indexExists = await client.indices.exists({ index: 'nasa-node-js' });
   if (!indexExists.body) {
     // If the index doesn't exist, create it with specified mappings
     await client.indices.create({
-      index: 'run-test-nasa',
+      index: 'nasa-node-js',
       body: {
         mappings: {
           properties: {
@@ -91,7 +99,7 @@ async function indexDataIntoElasticsearch(data) {
   }
 
   // Prepare the data for bulk indexing
-  const body = data.flatMap(doc => [{ index: { _index: 'run-test-nasa' } }, doc]);
+  const body = data.flatMap(doc => [{ index: { _index: 'nasa-node-js' } }, doc]);
   // Execute the bulk indexing operation
   await client.bulk({ refresh: true, body });
 }
