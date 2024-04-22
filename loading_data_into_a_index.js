@@ -82,9 +82,9 @@ async function indexDataIntoElasticsearch(data) {
       body: {
         mappings: {
           properties: {
+            id: { type: 'integer' },
             close_approach_date: { type: 'date' },
             name: { type: 'text' },
-            id: { type: 'keyword' },
             miss_distance_km: { type: 'float' },
           },
         },
@@ -92,8 +92,8 @@ async function indexDataIntoElasticsearch(data) {
     });
   }
 
-  // Prepare the data for bulk indexing
-  const body = data.flatMap(doc => [{ index: { _index: 'nasa-node-js' } }, doc]);
+  
+  const body = data.flatMap(doc => [{ index: { _index: 'nasa-node-js', _id: doc.id } }, doc]);
   // Execute the bulk indexing operation
   await client.bulk({ refresh: true, body });
 }
