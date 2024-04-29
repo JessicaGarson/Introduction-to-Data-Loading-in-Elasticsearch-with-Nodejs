@@ -28,13 +28,31 @@ Additionally, you'll need to have access to the NASA API, which requires an API 
 
 Create a `.env` file in the root of the project directory. Check out the [example .env file](.env_example) to learn more.
 
-## Running the Project
+### Running the Project
 
 To run the project, execute the following command in the terminal:
 
 ```
 node loading_data_into_a_index.js
 ```
+
+## Azure Function App
+
+You can use an Azure Function App to automate the process of updating data on a regular schedule. Azure Functions allow for serverless execution of code, which can significantly simplify cloud-based automation and integration tasks.
+
+### Requirements
+
+Before you begin, ensure you have the following:
+
+- An active Azure account
+- Access to Azure CLI or the Azure portal
+
+### Configuration
+
+The execution schedule for the Azure Function is configured in the `function.json` file, allowing the function to run at specified intervals. The main code that handles data operations is located in the `azure_index.js` file.
+
+- **Schedule Configuration**: To view or modify the function's timing, refer to the [`function.json` file](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/function.json).
+- **Function Code**: The primary functionality of the data processing is implemented in [`azure_index.js`](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/azure_index.js).
 
 ## Getting help
 
