@@ -51,7 +51,7 @@ Before you begin, ensure you have the following:
 
 The execution schedule for the Azure Function is configured in the `function.json` file, allowing the function to run at specified intervals. The main code that handles data operations is located in the `azure_index.js` file.
 
-- **Schedule Configuration**: To view or modify the function's timing, refer to the [`function.json` file](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/function.json).
+- **Schedule Configuration**: To view or modify the function's timing, refer to [`function.json`](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/function.json).
 - **Function Code**: The primary functionality of the data processing is implemented in [`azure_index.js`](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/azure_index.js).
 
 ## Getting help
