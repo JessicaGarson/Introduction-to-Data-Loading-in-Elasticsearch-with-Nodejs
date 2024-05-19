@@ -16,19 +16,42 @@ const client = new Client({
   auth: {
     apiKey: elasticApiKey
   }
-})
+});
+
+// Function to get the last update date from Elasticsearch
+async function getLastUpdateDate() {
+  try {
+    const response = await client.search({
+      index: 'nasa-node-js',
+      body: {
+        size: 1,
+        sort: [{ close_approach_date: { order: 'desc' } }],
+        _source: ['close_approach_date']
+      }
+    });
+
+    if (response.body && response.body.hits && response.body.hits.hits.length > 0) {
+      return response.body.hits.hits[0]._source.close_approach_date;
+    } else {
+      // Default to one week ago if no records found
+      const today = new Date();
+      const lastWeek = new Date(today);
+      lastWeek.setDate(today.getDate() - 7);
+      return lastWeek.toISOString().split('T')[0];
+    }
+  } catch (error) {
+    console.error('Error fetching last update date from Elasticsearch:', error);
+    throw error;
+  }
+}
 
 // Asynchronously fetch data from NASA's NEO (Near Earth Object) Web Service
-async function fetchNasaData() {
+async function fetchNasaData(startDate) {
   // Define the base URL for the NASA API request
   const url = "https://api.nasa.gov/neo/rest/v1/feed";
-  // Create Date objects for today and last week to define the query period
   const today = new Date();
-  const lastWeek = new Date(today);
-  lastWeek.setDate(today.getDate() - 7);
 
   // Format dates as YYYY-MM-DD for the API request
-  const startDate = lastWeek.toISOString().split('T')[0];
   const endDate = today.toISOString().split('T')[0];
 
   // Setup the query parameters including the API key and date range
@@ -71,28 +94,8 @@ function createStructuredData(response) {
   return allObjects;
 }
 
-// Asynchronously check for an index's existence in Elasticsearch and index data
+// Asynchronously index data into Elasticsearch
 async function indexDataIntoElasticsearch(data) {
-  // Check if the 'nasa-node-js' index exists in the Elasticsearch database
-  const indexExists = await client.indices.exists({ index: 'nasa-node-js' });
-  if (!indexExists.body) {
-    // If the index doesn't exist, create it with specified mappings
-    await client.indices.create({
-      index: 'nasa-node-js',
-      body: {
-        mappings: {
-          properties: {
-            id: { type: 'integer' },
-            close_approach_date: { type: 'date' },
-            name: { type: 'text' },
-            miss_distance_km: { type: 'float' },
-          },
-        },
-      },
-    });
-  }
-
-  
   const body = data.flatMap(doc => [{ index: { _index: 'nasa-node-js', _id: doc.id } }, doc]);
   // Execute the bulk indexing operation
   await client.bulk({ refresh: true, body });
@@ -100,22 +103,30 @@ async function indexDataIntoElasticsearch(data) {
 
 // Main function to run the process of fetching, structuring, and indexing data
 async function run() {
-  // Fetch data from NASA
-  const rawData = await fetchNasaData();
-  if (rawData) {
-    // Structure the fetched data
-    const structuredData = createStructuredData(rawData);
-    // Print the number of records
-    console.log(`Number of records being uploaded: ${structuredData.length}`);
-    if (structuredData.length > 0) {
-      // Index the structured data into Elasticsearch
-      await indexDataIntoElasticsearch(structuredData);
-      console.log('Data indexed successfully.');
+  try {
+    // Get the last update date from Elasticsearch
+    const lastUpdateDate = await getLastUpdateDate();
+    console.log(`Last update date from Elasticsearch: ${lastUpdateDate}`);
+
+    // Fetch data from NASA starting from the last update date
+    const rawData = await fetchNasaData(lastUpdateDate);
+    if (rawData) {
+      // Structure the fetched data
+      const structuredData = createStructuredData(rawData);
+      // Print the number of records
+      console.log(`Number of records being uploaded: ${structuredData.length}`);
+      if (structuredData.length > 0) {
+        // Index the structured data into Elasticsearch
+        await indexDataIntoElasticsearch(structuredData);
+        console.log('Data indexed successfully.');
+      } else {
+        console.log('No data to index.');
+      }
     } else {
-      console.log('No data to index.');
+      console.log('Failed to fetch data from NASA.');
     }
-  } else {
-    console.log('Failed to fetch data from NASA.');
+  } catch (error) {
+    console.error('Error in run process:', error);
   }
 }
 
