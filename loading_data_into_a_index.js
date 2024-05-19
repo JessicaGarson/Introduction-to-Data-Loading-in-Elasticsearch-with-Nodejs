@@ -1,11 +1,7 @@
-// Load environment variables from the .env file
-require('dotenv').config();
-
-// Import the Elasticsearch client and Axios for making HTTP requests
 const { Client } = require('@elastic/elasticsearch');
 const axios = require('axios');
 
-// Retrieve Elasticsearch and NASA API keys from environment variables
+// Retrieve environment variables
 const elasticEndpoint = process.env.ELASTIC_ENDPOINT;
 const elasticApiKey = process.env.ELASTIC_API_KEY;
 const nasaApiKey = process.env.NASA_API_KEY;
@@ -33,10 +29,10 @@ async function getLastUpdateDate() {
     if (response.body && response.body.hits && response.body.hits.hits.length > 0) {
       return response.body.hits.hits[0]._source.close_approach_date;
     } else {
-      // Default to one week ago if no records found
+      // Default to one day ago if no records found
       const today = new Date();
       const lastWeek = new Date(today);
-      lastWeek.setDate(today.getDate() - 7);
+      lastWeek.setDate(today.getDate() - 1);
       return lastWeek.toISOString().split('T')[0];
     }
   } catch (error) {
@@ -101,12 +97,12 @@ async function indexDataIntoElasticsearch(data) {
   await client.bulk({ refresh: true, body });
 }
 
-// Main function to run the process of fetching, structuring, and indexing data
-async function run() {
+// Azure Function entry point
+module.exports = async function (context, myTimer) {
   try {
     // Get the last update date from Elasticsearch
     const lastUpdateDate = await getLastUpdateDate();
-    console.log(`Last update date from Elasticsearch: ${lastUpdateDate}`);
+    context.log(`Last update date from Elasticsearch: ${lastUpdateDate}`);
 
     // Fetch data from NASA starting from the last update date
     const rawData = await fetchNasaData(lastUpdateDate);
@@ -114,21 +110,18 @@ async function run() {
       // Structure the fetched data
       const structuredData = createStructuredData(rawData);
       // Print the number of records
-      console.log(`Number of records being uploaded: ${structuredData.length}`);
+      context.log(`Number of records being uploaded: ${structuredData.length}`);
       if (structuredData.length > 0) {
         // Index the structured data into Elasticsearch
         await indexDataIntoElasticsearch(structuredData);
-        console.log('Data indexed successfully.');
+        context.log('Data indexed successfully.');
       } else {
-        console.log('No data to index.');
+        context.log('No data to index.');
       }
     } else {
-      console.log('Failed to fetch data from NASA.');
+      context.log('Failed to fetch data from NASA.');
     }
   } catch (error) {
-    console.error('Error in run process:', error);
+    context.log('Error in run process:', error);
   }
-}
-
-// Run the main function and catch any errors
-run().catch(console.error);
+};
