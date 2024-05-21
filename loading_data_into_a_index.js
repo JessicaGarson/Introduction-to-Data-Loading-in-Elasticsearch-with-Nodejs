@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const { Client } = require('@elastic/elasticsearch');
 const axios = require('axios');
 
