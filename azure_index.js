@@ -2,15 +2,15 @@ const { Client } = require('@elastic/elasticsearch');
 const axios = require('axios');
 
 // Retrieve environment variables
-const elasticEndpoint = process.env.ELASTIC_ENDPOINT;
-const elasticApiKey = process.env.ELASTIC_API_KEY;
+const elasticsearchEndpoint = process.env.ELASTICSEARCH_ENDPOINT;
+const elasticsearchApiKey = process.env.ELASTICSEARCH_API_KEY;
 const nasaApiKey = process.env.NASA_API_KEY;
 
 // Authenticate to Elasticsearch
 const client = new Client({
-  node: elasticEndpoint,
+  node: elasticsearchEndpoint,
   auth: {
-    apiKey: elasticApiKey
+    apiKey: elasticsearchApiKey
   }
 });
 
