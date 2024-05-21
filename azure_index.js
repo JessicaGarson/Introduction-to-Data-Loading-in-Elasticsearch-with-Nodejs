@@ -94,7 +94,7 @@ function createStructuredData(response) {
 async function indexDataIntoElasticsearch(data) {
   const body = data.flatMap(doc => [{ index: { _index: 'nasa-node-js', _id: doc.id } }, doc]);
   // Execute the bulk indexing operation
-  await client.bulk({ refresh: true, body });
+  await client.bulk({ refresh: false, body });
 }
 
 // Azure Function entry point
