@@ -36,24 +36,6 @@ To run the project, execute the following command in the terminal:
 node loading_data_into_a_index.js
 ```
 
-## Azure Function App
-
-You can use an Azure Function App to automate the process of updating data on a regular schedule. Azure Functions allow for serverless execution of code, which can significantly simplify cloud-based automation and integration tasks.
-
-### Requirements
-
-Before you begin, ensure you have the following:
-
-- An active Azure account
-- Access to Azure CLI or the Azure portal
-
-### Configuration
-
-The execution schedule for the Azure Function is configured in the `function.json` file, allowing the function to run at specified intervals. The main code that handles data operations is located in the `azure_index.js` file.
-
-- **Schedule Configuration**: To view or modify the function's timing, refer to [`function.json`](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/function.json).
-- **Function Code**: The primary functionality of the data processing is implemented in [`azure_index.js`](https://github.com/JessicaGarson/Introduction-to-Data-Loading-in-Elasticsearch-with-Nodejs/blob/main/azure_index.js).
-
 ## Getting help
 
 Let us know if you need if this blog post inspires you to build anything or if you have any questions on our [Discuss forums](https://discuss.elastic.co/) and [the community Slack channel](https://communityinviter.com/apps/elasticstack/elastic-community).
